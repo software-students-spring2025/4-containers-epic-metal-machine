@@ -10,6 +10,7 @@ pytesseract = "*"
 pylint = "*"
 tomli = "*"
 typing-extensions = "*"
+black = "*"
 
 [dev-packages]
 

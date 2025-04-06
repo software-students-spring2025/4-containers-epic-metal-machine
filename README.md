@@ -36,3 +36,10 @@ Run the web app on [http://127.0.0.1:8000](http://127.0.0.1:8000)
 ```
 python3 app.py
 ```
+
+## Development pipeline
+1. Write new code
+1. Run ```pipenv run pylint modified_file.py``` to ensure you score 10/10
+1. Run ```pipenv run black app.py``` to format code
+
+Otherwise, the CI linting will most likely fail, resulting in a nasty red cross on your commit.
