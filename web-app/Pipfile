@@ -9,6 +9,7 @@ opencv-python = "*"
 pytesseract = "*"
 pylint = "*"
 tomli = "*"
+typing-extensions = "*"
 
 [dev-packages]
 
