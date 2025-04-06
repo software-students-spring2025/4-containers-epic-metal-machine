@@ -8,6 +8,7 @@ flask = "*"
 opencv-python = "*"
 pytesseract = "*"
 pylint = "*"
+tomli = "*"
 
 [dev-packages]
 
