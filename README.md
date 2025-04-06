@@ -4,6 +4,7 @@
 ## Installing development environment
 Create and activate python virtual environment
 ```
+cd web-app
 python3 -m venv venv
 source venv/bin/activate
 ```
@@ -33,5 +34,5 @@ sudo apt install libtesseract-dev
 
 Run the web app on [http://127.0.0.1:8000](http://127.0.0.1:8000)
 ```
-python3 web-app/app.py
+python3 app.py
 ```

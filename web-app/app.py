@@ -18,13 +18,11 @@ def valid_file(f):
     """ Checks if a valid extension is used """
     return '.' in f and f.rsplit('.', 1)[1].lower() in valid_extensions
 
-# home
 @app.route('/')
 def home():
     """ Routing for index """
     return rt('home.html')
 
-# this page shows the results of the transcription
 @app.route('/upload', methods=['POST'])
 def upload():
     """ Routing for upload """
@@ -53,6 +51,27 @@ def upload():
         config="--oem 3 --psm 6",
         output_type=Output.DICT
     )
+    box_path = draw_boxes(filename, processed_pil, data)
+    lines = {}
+    # loop through words again and remove ones from transcription with low confidence
+    # will figure out how to just make this one loop instead of two at a later date
+    for i in range(len(data['text'])):
+        word = data['text'][i]
+        conf = int(data['conf'][i])
+        line_num = data['line_num'][i]
+        # feel free to toy around with this number-- it represents a confidence threshold and
+        # any text that falls below it will not be included in the transcription. Not sure if 40
+        # is a good value or not
+        if conf > 40 and word.strip():
+            if line_num not in lines:
+                lines[line_num] = []
+            lines[line_num].append(word.strip())
+    extracted = '\n'.join([' '.join(line_words) for line_words in lines.values()])
+    return rt('upload.html', image_file=filepath, boxed_image=box_path, text=extracted)
+
+def draw_boxes(filename, processed_pil, data):
+    "Draw boxes, save image, and return path to image"
+
     boxes = cv2.cvtColor(np.array(processed_pil), cv2.COLOR_RGB2BGR)
     # loops through each word and adds box around it on image
     for i in range(len(data['text'])):
@@ -73,22 +92,7 @@ def upload():
     box_filename = 'box_' + filename
     box_path = os.path.join('static/processed', box_filename)
     cv2.imwrite(box_path, boxes)
-    lines = {}
-    # loop through words again and remove ones from transcription with low confidence
-    # will figure out how to just make this one loop instead of two at a later date
-    for i in range(len(data['text'])):
-        word = data['text'][i]
-        conf = int(data['conf'][i])
-        line_num = data['line_num'][i]
-        # feel free to toy around with this number-- it represents a confidence threshold and
-        # any text that falls below it will not be included in the transcription. Not sure if 40
-        # is a good value or not
-        if conf > 40 and word.strip():
-            if line_num not in lines:
-                lines[line_num] = []
-            lines[line_num].append(word.strip())
-    extracted = '\n'.join([' '.join(line_words) for line_words in lines.values()])
-    return rt('upload.html', image_file=filepath, boxed_image=box_path, text=extracted)
+    return box_path
 
 
 if __name__ == '__main__':
