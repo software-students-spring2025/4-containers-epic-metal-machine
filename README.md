@@ -2,14 +2,20 @@
 
 
 ## Installing development environment
-Create python virtual environment
+Create and activate python virtual environment
 ```
 python3 -m venv venv
+source venv/bin/activate
 ```
 
-Install library dependencies with repsect to ```venv_requirements.txt```
+Install pipenv
 ```
-pip3 install -r venv_requirements.txt
+pip3 install pipenv
+```
+
+Install library dependencies with repsect to ```Pipfile```
+```
+pipenv install
 ```
 
 Install tesseract binary:\
