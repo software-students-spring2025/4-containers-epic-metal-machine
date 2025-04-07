@@ -9,6 +9,8 @@ opencv-python = "*"
 pytesseract = "*"
 pylint = "*"
 tomli = "*"
+pymongo = "*"
+dotenv = "*"
 typing-extensions = "*"
 black = "*"
 
