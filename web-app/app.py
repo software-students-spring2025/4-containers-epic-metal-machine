@@ -8,6 +8,7 @@ import pytesseract
 from pytesseract import Output
 import cv2
 import numpy as np
+from db import db
 
 valid_extensions = {"png", "jpeg", "jpg"}  # can update this with more extensions later
 UPLOADS = "static/uploads"
