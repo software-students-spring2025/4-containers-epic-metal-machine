@@ -1,3 +1,10 @@
+# Team Members
+[Alex Wang](https://github.com/alw9411), [Kurt Luko](https://github.com/kl3641), [Sophia Wang](https://github.com/s-m-wang), [Johnny Ding](https://github.com/yd2960)
+
+# Project Description
+Our project recognizes text in images and transcribes it to plaintext.
+
+# Lint Free version
 ![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
 
 
