@@ -10,6 +10,8 @@ black = "*"
 requests = "*"
 tomli = "*"
 typing-extensions = "*"
+pymongo = "*"
+dotenv = "*"
 
 [dev-packages]
 
