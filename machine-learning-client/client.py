@@ -1,7 +1,7 @@
 """Routers for webapp"""
 
 import os
-from flask import render_template as rt, Flask, request
+from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename as sf
 from PIL import Image
 import pytesseract
@@ -10,29 +10,23 @@ import cv2
 import numpy as np
 
 app = Flask(__name__)
+UPLOADS = "static/uploads"
+app.config["UPLOAD_FOLDER"] = UPLOADS
 
 # can update this with more extensions later
-valid_extensions = {"png", "jpeg", "jpg"} 
+valid_extensions = {"png", "jpeg", "jpg"}
+
 
 def valid_file(f):
     """Checks if a valid extension is used"""
     return "." in f and f.rsplit(".", 1)[1].lower() in valid_extensions
 
+
 @app.route("/upload", methods=["POST"])
 def upload():
     """Routing for upload"""
 
-    print("======== YESSIRSEawidbawdawdwadad ========")
-
-    # Checks if an image was uploaded
-    if "image" not in request.files:
-        return "Error: No image uploaded"
-    file = request.files["image"]
-    if file.filename == "":
-        return "No selected file"
-    if not file or not valid_file(file.filename):
-        return "Invalid file type"
-
+    file = request.files["file"]
     filename = sf(file.filename)
     filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
     file.save(filepath)
@@ -47,7 +41,7 @@ def upload():
     data = pytesseract.image_to_data(
         processed_pil, config="--oem 3 --psm 6", output_type=Output.DICT
     )
-    box_path = draw_boxes(filename, processed_pil, data)
+    # box_path = draw_boxes(filename, processed_pil, data)
     lines = {}
     # loop through words again and remove ones from transcription with low confidence
     # will figure out how to just make this one loop instead of two at a later date
@@ -63,9 +57,11 @@ def upload():
                 lines[line_num] = []
             lines[line_num].append(word.strip())
     extracted = "\n".join([" ".join(line_words) for line_words in lines.values()])
-    return rt("upload.html", image_file=filepath, boxed_image=box_path, text=extracted)
+    data = {"text": extracted}
+    return jsonify(data)
 
 
+# Currently the function is not called
 def draw_boxes(filename, processed_pil, data):
     "Draw boxes, save image, and return path to image"
 
@@ -95,3 +91,8 @@ def draw_boxes(filename, processed_pil, data):
     box_path = os.path.join("static/processed", box_filename)
     cv2.imwrite(box_path, boxes)
     return box_path
+
+
+if __name__ == "__main__":
+    os.makedirs(UPLOADS, exist_ok=True)
+    app.run(host="0.0.0.0", port=8000, debug=True)

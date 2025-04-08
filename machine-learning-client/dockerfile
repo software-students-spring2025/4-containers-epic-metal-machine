@@ -5,8 +5,8 @@ FROM python:3.10-slim-buster
 WORKDIR /app
 
 # install dependencies into the image - doing this first will speed up subsequent builds, as Docker will cache this step
-COPY requirements.txt ./
-RUN pip3 install -r requirements.txt
+COPY container_req.txt ./
+RUN pip3 install -r container_req.txt
 
 # install tesseract
 RUN apt-get update && apt-get install -y \

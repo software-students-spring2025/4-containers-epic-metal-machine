@@ -1,6 +1,2 @@
 [MASTER]
 ignore=venv
-
-# cv2 is a dynamic c library
-# static analysis with pylint raises error
-generated-members=cv2.*
