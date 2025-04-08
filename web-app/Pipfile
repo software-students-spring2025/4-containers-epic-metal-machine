@@ -5,11 +5,7 @@ name = "pypi"
 
 [packages]
 flask = "*"
-opencv-python = "*"
-pytesseract = "*"
 pylint = "*"
-tomli = "*"
-typing-extensions = "*"
 black = "*"
 
 [dev-packages]
