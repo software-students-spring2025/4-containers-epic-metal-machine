@@ -7,6 +7,7 @@ name = "pypi"
 flask = "*"
 pylint = "*"
 black = "*"
+requests = "*"
 
 [dev-packages]
 
