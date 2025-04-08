@@ -2,6 +2,7 @@
 
 import pymongo
 from dotenv import load_dotenv
+
 load_dotenv()
 
 connection = pymongo.MongoClient("mongodb://localhost:27017/")
