@@ -1,9 +1,11 @@
 """Routers for webapp"""
 
+import datetime
 from flask import Flask, render_template as rt, request
 import requests
 from db import db
-import datetime
+
+
 
 # can update this with more extensions later
 valid_extensions = {"png", "jpeg", "jpg"}
@@ -46,3 +48,4 @@ def upload():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
+

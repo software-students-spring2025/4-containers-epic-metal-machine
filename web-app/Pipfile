@@ -13,6 +13,7 @@ typing-extensions = "*"
 pymongo = "*"
 dotenv = "*"
 
+
 [dev-packages]
 
 [requires]
