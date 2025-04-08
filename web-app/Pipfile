@@ -9,6 +9,7 @@ pylint = "*"
 black = "*"
 requests = "*"
 tomli = "*"
+typing-extensions = "*"
 
 [dev-packages]
 
