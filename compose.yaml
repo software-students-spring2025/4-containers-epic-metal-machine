@@ -1,0 +1,21 @@
+version: '3.10'
+services:
+  backend:
+    build: ./machine-learning-client/
+    expose:
+      - "5000"
+    networks:
+      - app-network
+
+  frontend:
+    build: ./web-app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
