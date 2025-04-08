@@ -2,12 +2,76 @@
 <html>
 <head>
     <title>Image Upload</title>
+    <link rel="stylesheet" href="../static/home.css">
 </head>
 <body>
-    <h1>Upload an image to extract text</h1>
-    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
-        <input type="file" name="image" accept="image/*" required>
-        <input type="submit" value="Transcribe">
-    </form>
+    <div class="title">Epic Metal Machine  &nbsp <p>&#129302</p></div>
+    <div class="subtitle">Having trouble reading messy handwriting? Fear not! Our Epic Metal Machine is here to help. We transcribe
+        messy handwriting into legible print. Make sure
+        your file has the JPG, PNG, or JPEG extension.
+    </div>
+    <div class="l"></div>
+    <div class="uploadHere">Upload your image here!</div>
+    <div class="uploadPic">
+        <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+            <input type="file" style="color:transparent;" id="fileInput" name="image" accept="image/*" required>
+            <input type="submit" class="sub" value="Transcribe">
+        </form>
+    </div>
+
+<div id="preview"></div>
+
+<script>
+	document.getElementById('fileInput').addEventListener('change', function(event) {
+    var files = event.target.files;
+    var preview = document.getElementById('preview');
+    
+    // Clear any existing content
+    preview.innerHTML = '';
+
+    // Loop through all selected files
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+
+      // Only process image files
+      if (!file.type.match('image.*')) {
+        continue;
+      }
+
+      var imgContainer = document.createElement('div');
+      imgContainer.style.marginBottom = '20px'; // Spacing between each image container
+      imgContainer.style.display =  'flex';
+      imgContainer.style.justifyContent = 'center';
+      imgContainer.style.alignItems = 'center';
+      imgContainer.style.textAlign = 'center';
+      imgContainer.style.flexDirection = 'column';
+
+      var img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.style.height = '45vh';
+      img.style.display = 'block'; // Ensure the image is displayed in a block to put it on a new line
+      img.style.marginTop = '5vh';
+      img.style.backgroundColor = '#606c38';
+      img.style.padding = '5vh';
+      img.style.borderRadius = '12px';
+      
+
+      var fileInfo = document.createElement('p');
+      fileInfo.textContent = `File Name: ${file.name}, Type: ${file.type}, Size: ${file.size} bytes`;
+      fileInfo.style.fontSize = '2vh';
+      fileInfo.style.marginTop = '2vh';
+      fileInfo.style.marginBottom = '15vh';
+
+      // Append the image and file info to the container
+      imgContainer.appendChild(img);
+      imgContainer.appendChild(fileInfo);
+
+      // Append the container to the preview div
+      preview.appendChild(imgContainer);
+    }
+  });
+</script>
+
+
 </body>
 </html>
