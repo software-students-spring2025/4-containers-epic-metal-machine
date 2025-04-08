@@ -8,6 +8,7 @@ flask = "*"
 pylint = "*"
 black = "*"
 requests = "*"
+tomli = "*"
 
 [dev-packages]
 
