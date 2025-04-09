@@ -15,9 +15,14 @@ docker compose up --build
 ```
 The web app now runs on [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-## Development pipeline
+# Mongodb connection string
+After booting the app, use ```mongodb://localhost:27017``` to connect to the database
+
+
+# Development pipeline
 These instructions need further work
-1. Write new code
+1. Go to either ```/machine-learning-client``` or ```/web-app``` folder
+1. Run ```source venv/bin/activate``` to boot virtual environment
 1. Run ```pipenv run pylint modified_file.py``` to ensure you score 10/10
 1. Run ```pipenv run black modified_file.py``` to format code
 

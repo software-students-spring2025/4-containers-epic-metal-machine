@@ -1,4 +1,4 @@
-"""Routers for webapp"""
+"""Routers for machine learning client"""
 
 import os
 from flask import Flask, request, jsonify
@@ -7,7 +7,14 @@ from PIL import Image
 import pytesseract
 from pytesseract import Output
 import cv2
-import numpy as np
+from pymongo import MongoClient
+
+# mongodb compass connection string is mongodb://localhost:27017
+client = MongoClient("mongodb://mongodb:27017/")
+
+db = client["users"]
+collection = db["users"]
+
 
 app = Flask(__name__)
 UPLOADS = "static/uploads"
@@ -41,7 +48,6 @@ def upload():
     data = pytesseract.image_to_data(
         processed_pil, config="--oem 3 --psm 6", output_type=Output.DICT
     )
-    # box_path = draw_boxes(filename, processed_pil, data)
     lines = {}
     # loop through words again and remove ones from transcription with low confidence
     # will figure out how to just make this one loop instead of two at a later date
@@ -58,39 +64,12 @@ def upload():
             lines[line_num].append(word.strip())
     extracted = "\n".join([" ".join(line_words) for line_words in lines.values()])
     data = {"text": extracted}
+
+    # TO ALEX: SEE HERE
+    user_data = {"name": "John Doe", "email": "john@example.com", "age": 28}
+    collection.insert_one(user_data)
+
     return jsonify(data)
-
-
-# Currently the function is not called
-def draw_boxes(filename, processed_pil, data):
-    "Draw boxes, save image, and return path to image"
-
-    boxes = cv2.cvtColor(np.array(processed_pil), cv2.COLOR_RGB2BGR)
-    # loops through each word and adds box around it on image
-    for i in range(len(data["text"])):
-        word = data["text"][i]
-        conf = int(data["conf"][i])
-        # feel free to toy around with this number-- it represents a confidence threshold for
-        # drawing boundary boxes on the image. Anything that falls below it will not be included
-        # in the transcription. Not sure if 60 is a good value or not '''
-        if conf > 60 and word.strip():
-            x, y, w, h = (
-                data["left"][i],
-                data["top"][i],
-                data["width"][i],
-                data["height"][i],
-            )
-            # could  change the look of the box on the image by tweaking this @ Johnny and Sophia
-            # x --> left-most x pixel
-            # y  --> top-most y pixel
-            # w --> width
-            # h --> height '''
-            cv2.rectangle(boxes, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    # save new image with added boxes
-    box_filename = "box_" + filename
-    box_path = os.path.join("static/processed", box_filename)
-    cv2.imwrite(box_path, boxes)
-    return box_path
 
 
 if __name__ == "__main__":
