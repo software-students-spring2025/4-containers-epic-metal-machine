@@ -27,17 +27,19 @@ def home():
     return rt("home.html")
 
 
-@app.route("/signup", methods=['GET', 'POST'])
+@app.route("/signup", methods=["GET", "POST"])
 def sign_up():
     """Sign up screen"""
     if request.method == "POST":
         username = request.form.get("username")
         email = request.form.get("email")
         password = request.form.get("password")
-        user = {"username": username,
-                "email": email,
-                "password": password,
-                "saved_transcriptions": []}
+        user = {
+            "username": username,
+            "email": email,
+            "password": password,
+            "saved_transcriptions": [],
+        }
         user = db.users.insert_one(user)
         session["user_id"] = str(user.inserted_id)
         return redirect("/")
