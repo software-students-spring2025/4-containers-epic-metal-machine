@@ -1,8 +1,13 @@
 """Routers for webapp"""
 
 # import datetime
-from flask import Flask, render_template as rt, request
+from flask import Flask, render_template as rt, request, session, redirect
 import requests
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+
+client = MongoClient("mongodb://mongodb:27017/")
+db = client["users"]
 
 # can update this with more extensions later
 valid_extensions = {"png", "jpeg", "jpg"}
@@ -22,6 +27,48 @@ def home():
     return rt("home.html")
 
 
+@app.route("/signup", methods=["GET", "POST"])
+def sign_up():
+    """Sign up screen"""
+    if request.method == "POST":
+        username = request.form.get("username")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        user = {
+            "username": username,
+            "email": email,
+            "password": password,
+            "saved_transcriptions": [],
+        }
+        user = db.users.insert_one(user)
+        session["user_id"] = str(user.inserted_id)
+        return redirect("/")
+    return rt("signup.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Login screen"""
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        if db.users.find_one({"username": username, "password": password}) is not None:
+            user = db.users.find_one({"username": username, "password": password})
+            session["user_id"] = str(user["_id"])
+            print(session["user_id"])
+            return redirect("/home")
+    return rt("login.html")
+
+
+@app.route("/profile_page")
+def profile():
+    """Profile screen"""
+    if not session.get("user_id"):
+        return redirect("/home")
+    user = db.users.find_one({"_id": ObjectId(session.get("user_id"))})
+    return rt("profile_page.html", user=user)
+
+
 @app.route("/upload", methods=["POST"])
 def upload():
     """ "Reads file upload and relay to backend"""
@@ -38,7 +85,6 @@ def upload():
     url = "http://backend:8000/upload"
     files = {"file": file}
     data = requests.post(url, files=files, timeout=3).json()
-    # curr_file = {"text": data["text"], "timestamp": datetime.datetime}
     return rt("upload.html", text=data["text"])
 
 
