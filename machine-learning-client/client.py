@@ -1,7 +1,6 @@
 """Routers for machine learning client"""
 
 import os
-import datetime
 
 from bson import ObjectId
 from flask import Flask, request, jsonify, session
@@ -66,8 +65,7 @@ def upload():
                 lines[line_num] = []
             lines[line_num].append(word.strip())
     extracted = "\n".join([" ".join(line_words) for line_words in lines.values()])
-
-    data = {"file": filepath, "text": extracted, "time": datetime.datetime}
+    data = {"file": filepath, "text": extracted}
     if session.get("user_id"):
         user = db.users.find_one({"_id": ObjectId(session.get("user_id"))})
         user["saved_transcriptions"].append(data)
@@ -79,7 +77,6 @@ def upload():
                 }
             },
         )
-
     return jsonify(data)
 
 
