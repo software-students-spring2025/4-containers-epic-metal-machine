@@ -27,8 +27,23 @@ def home():
     return rt("home.html")
 
 
+@app.route("/signup", methods=['GET', 'POST'])
+def sign_up():
+    """Sign up screen"""
+    if request.method == "POST":
+        username = request.form.get("username")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        user = {"username": username, "email": email, "password": password, "saved_transcriptions": []}
+        user = db.users.insert_one(user)
+        session["user_id"] = str(user.inserted_id)
+        return redirect("/")
+    return rt("signup.html")
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """Login screen"""
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
@@ -42,6 +57,7 @@ def login():
 
 @app.route("/profile_page")
 def profile():
+    """Profile screen"""
     if not session.get("user_id"):
         return redirect("/home")
     user = db.users.find_one({"_id": ObjectId(session.get("user_id"))})

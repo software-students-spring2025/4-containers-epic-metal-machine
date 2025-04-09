@@ -70,7 +70,7 @@ def upload():
     data = {"file": filepath, "text": extracted, "time": datetime.datetime}
     if session.get("user_id"):
         user = db.users.find_one({"_id": ObjectId(session.get("user_id"))})
-        user["saved transcriptions"].append(data)
+        user["saved_transcriptions"].append(data)
         db.users.update_one(
             {"_id": user["_id"]},  # match criteria
             {
