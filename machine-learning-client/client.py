@@ -1,7 +1,10 @@
 """Routers for machine learning client"""
 
 import os
-from flask import Flask, request, jsonify
+import datetime
+
+from bson import ObjectId
+from flask import Flask, request, jsonify, session
 from werkzeug.utils import secure_filename as sf
 from PIL import Image
 import pytesseract
@@ -63,11 +66,19 @@ def upload():
                 lines[line_num] = []
             lines[line_num].append(word.strip())
     extracted = "\n".join([" ".join(line_words) for line_words in lines.values()])
-    data = {"text": extracted}
 
-    # TO ALEX: SEE HERE
-    user_data = {"name": "John Doe", "email": "john@example.com", "age": 28}
-    collection.insert_one(user_data)
+    data = {"file": filepath, "text": extracted, "time": datetime.datetime}
+    if session.get("user_id"):
+        user = db.users.find_one({"_id": ObjectId(session.get("user_id"))})
+        user["saved transcriptions"].append(data)
+        db.users.update_one(
+            {"_id": user["_id"]},  # match criteria
+            {
+                "$set": {
+                    "saved_recipes": list(user["saved_recipes"]),
+                }
+            },
+        )
 
     return jsonify(data)
 
