@@ -1,9 +1,8 @@
 """Routers for webapp"""
 
-import datetime
+# import datetime
 from flask import Flask, render_template as rt, request
 import requests
-from db import db
 
 # can update this with more extensions later
 valid_extensions = {"png", "jpeg", "jpg"}
@@ -38,9 +37,8 @@ def upload():
 
     url = "http://backend:8000/upload"
     files = {"file": file}
-    data = requests.post(url, files=files, timeout=1).json()
-    curr_file = {"text": data["text"], "timestamp": datetime.datetime}
-    db.file.insert_one(curr_file)
+    data = requests.post(url, files=files, timeout=3).json()
+    # curr_file = {"text": data["text"], "timestamp": datetime.datetime}
     return rt("upload.html", text=data["text"])
 
 

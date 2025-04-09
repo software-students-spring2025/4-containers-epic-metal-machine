@@ -11,6 +11,7 @@ pylint = "*"
 tomli = "*"
 typing-extensions = "*"
 black = "*"
+pymongo = "*"
 
 [dev-packages]
 

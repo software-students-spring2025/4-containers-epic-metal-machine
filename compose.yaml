@@ -6,6 +6,8 @@ services:
       - "5000"
     networks:
       - app-network
+    depends_on:
+      - mongodb
 
   frontend:
     build: ./web-app
@@ -13,6 +15,14 @@ services:
       - "8000:8000"
     depends_on:
       - backend
+    networks:
+      - app-network
+    
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    attach: false # disable logging
     networks:
       - app-network
 
