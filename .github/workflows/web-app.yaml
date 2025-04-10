@@ -1,4 +1,4 @@
-name: CI / CD
+name: web-app
 
 on: [pull_request]
 
@@ -21,7 +21,6 @@ jobs:
       - name: Install local dependencies
         run: |
           pipenv install --dev  # or --system if you prefer plain pip
-          pipenv install -r machine_learning_client/container_req.txt
           pipenv install -r web-app/container_req.txt
 
       - name: Run pytest on all tests
