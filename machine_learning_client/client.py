@@ -1,7 +1,6 @@
 """Routers for machine learning client"""
 
 import os
-
 from datetime import datetime
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename as sf
