@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="../static/login.css">
+</head>
+<body>
+    <div class="title">Epic Metal Machine  &nbsp <p>&#129302</p></div>
+
+    <div class="subtitle">Login to continue or sign up to get started!
+    </div>
+
+    <div class="info">
+        <form action="{{ url_for('login') }}" method="POST">
+                    
+                <label for="email">Username:  </label><br>
+                <input style="height:5vh; width:30vw;font-size: 3vh; padding-left: 1vw; background-color: #FFFFFF; color:#B96B50; border: solid #606c38; margin-bottom: 2vh; margin-top:1vh" type="text" id="username" name="username" required><br><br>
+                <label for="password">Password:  </label><br>
+                <input style="height:5vh; width:30vw;font-size: 3vh; padding-left: 1vw; background-color: #FFFFFF; color:#B96B50; border: solid #606c38; margin-bottom: 2vh; margin-top:1vh" type="text" id="password" name="password" required><br><br>
+                <input style="height:6vh; width:31.5vw;font-size: 3vh; border-radius: 12px; padding-left: 1vw; background-color: #606c38; color:#FFFFFF; border: solid #606c38; margin-bottom: 2vh; margin-top:1vh" type="submit" value="Login"><br><br>
+       
+        </form>
+    </div>
+
+    <div class="signup">
+        <a href="{{ url_for('sign_up') }}">
+            Sign Up Here
+        </a>
+        
+    </div>
+
+
+</body>
+</html>
