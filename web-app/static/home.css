@@ -1,0 +1,91 @@
+body {
+    background-color: #fefae0;
+    height: 120vh
+}
+
+.title {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    font-size: 5vw;
+    color: #606c38;
+    height: 20vh;
+    margin-top: 15vh;
+    font-weight: 900;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.subtitle {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    font-size: 2vw;
+    color: #a5a58d;
+    margin-left: 10%;
+    margin-right: 10%;
+    padding-bottom: 10vh;
+}
+
+.l {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #888;
+  }
+
+.uploadHere {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    font-size: 3vw;
+    color: #606c38;
+    margin: 6vh;
+    margin-left: 10%;
+    font-weight: bold;
+    margin-right: 10%;
+}
+
+.uploadPic {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+
+}
+
+input::file-selector-button {
+    font-weight: bold;
+    font-size: 3vh;
+    background-color: #d4a373;
+    color: #283618;
+    padding: 2vh;
+    border: none;
+    border-radius: 12px;
+    margin-top: 2vh;
+    
+  }
+
+  input::file-selector-button:hover {
+    background-color: #faedcd;
+    cursor: pointer;
+  }
+
+  .sub {
+    font-weight: bold;
+    font-size: 3vh;
+    background-color: #ddb892;
+    color: #283618;
+    padding: 2vh;
+    border: none;
+    border-radius: 12px;
+    margin-top: 2vh;
+  }
+
+  .sub:hover {
+    background-color: #faedcd;
+    cursor: pointer;
+  }

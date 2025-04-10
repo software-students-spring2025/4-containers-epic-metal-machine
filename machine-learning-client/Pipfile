@@ -4,8 +4,14 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+flask = "*"
+opencv-python = "*"
+pytesseract = "*"
 pylint = "*"
+tomli = "*"
+typing-extensions = "*"
 black = "*"
+pymongo = "*"
 
 [dev-packages]
 

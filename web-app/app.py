@@ -1,18 +1,33 @@
 """Routers for webapp"""
 
-import os
-from flask import Flask, render_template as rt, request
-from werkzeug.utils import secure_filename as sf
-from PIL import Image
-import pytesseract
-from pytesseract import Output
-import cv2
-import numpy as np
+# import datetime
+from flask import (
+    Flask,
+    render_template as rt,
+    request,
+    redirect,
+    url_for,
+    flash,
+)
+from flask_login import (
+    LoginManager,
+    login_user,
+    logout_user,
+    login_required,
+    UserMixin,
+    current_user,
+)
+import requests
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+from werkzeug.security import generate_password_hash, check_password_hash
 
-valid_extensions = {"png", "jpeg", "jpg"}  # can update this with more extensions later
-UPLOADS = "static/uploads"
-app = Flask(__name__)
-app.config["UPLOAD_FOLDER"] = UPLOADS
+client = MongoClient("mongodb://mongodb:27017/")
+db = client["epic-metal-machine"]
+collection = db["entries"]
+
+# can update this with more extensions later
+valid_extensions = {"png", "jpeg", "jpg"}
 
 
 def valid_file(f):
@@ -20,15 +35,85 @@ def valid_file(f):
     return "." in f and f.rsplit(".", 1)[1].lower() in valid_extensions
 
 
+app = Flask(__name__)
+app.secret_key = "your_secret_key_here"
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+
+class User(UserMixin):
+    """User class"""
+
+    def __init__(self, id, username, password_hash):
+        self.id = id
+        self.username = username
+        self.password_hash = password_hash
+
+    def check_password(self, password):
+        """checks password"""
+        return check_password_hash(self.password_hash, password)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load user callback"""
+    user_data = db["users"].find_one({"_id": ObjectId(user_id)})
+    if user_data:
+        return User(user_data["_id"], user_data["username"], user_data["password"])
+    return None
+
+
 @app.route("/")
+@login_required
 def home():
     """Routing for index"""
     return rt("home.html")
 
 
+@app.route("/signup", methods=["GET", "POST"])
+def sign_up():
+    """Sign up screen"""
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        user = {
+            "username": username,
+            "password": generate_password_hash(password),
+        }
+        user = db["users"].insert_one(user)
+        flash("Registration successful! Please log in.", "success")
+        return redirect(url_for("login"))
+    return rt("signup.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Login screen"""
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # Look for the user in our in-memory database
+        user_data = db["users"].find_one({"username": username})
+
+        if user_data and check_password_hash(user_data["password"], password):
+            login_user(
+                User(user_data["_id"], user_data["username"], user_data["password"])
+            )
+            flash("Logged in successfully.")
+            return redirect(url_for("home"))
+
+        flash("Invalid username or password")
+        return redirect(url_for("login"))
+    return rt("login.html")
+
+
 @app.route("/upload", methods=["POST"])
+@login_required
 def upload():
-    """Routing for upload"""
+    """Reads file upload and relay to backend"""
+
     # Checks if an image was uploaded
     if "image" not in request.files:
         return "Error: No image uploaded"
@@ -38,70 +123,31 @@ def upload():
     if not file or not valid_file(file.filename):
         return "Invalid file type"
 
-    filename = sf(file.filename)
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-    file.save(filepath)
-    cv_img = cv2.imread(filepath)
-    # Removes color from the image. I think this should improve performance in theory but
-    # maybe there's a situation where this will actually cause problems? idk. also ups the
-    # contrast of the image
-    gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    processed_pil = Image.fromarray(thresh)
-    # run tesseract
-    data = pytesseract.image_to_data(
-        processed_pil, config="--oem 3 --psm 6", output_type=Output.DICT
-    )
-    box_path = draw_boxes(filename, processed_pil, data)
-    lines = {}
-    # loop through words again and remove ones from transcription with low confidence
-    # will figure out how to just make this one loop instead of two at a later date
-    for i in range(len(data["text"])):
-        word = data["text"][i]
-        conf = int(data["conf"][i])
-        line_num = data["line_num"][i]
-        # feel free to toy around with this number-- it represents a confidence threshold and
-        # any text that falls below it will not be included in the transcription. Not sure if 40
-        # is a good value or not
-        if conf > 40 and word.strip():
-            if line_num not in lines:
-                lines[line_num] = []
-            lines[line_num].append(word.strip())
-    extracted = "\n".join([" ".join(line_words) for line_words in lines.values()])
-    return rt("upload.html", image_file=filepath, boxed_image=box_path, text=extracted)
+    url = "http://backend:8000/upload"
+    file = {"file": file}
+    data = {"id": current_user.id}
+    requests.post(url, files=file, data=data, timeout=3)
+    return redirect(url_for("history"))
 
 
-def draw_boxes(filename, processed_pil, data):
-    "Draw boxes, save image, and return path to image"
+@app.route("/history", methods=["GET"])
+@login_required
+def history():
+    """Return OCR history"""
 
-    boxes = cv2.cvtColor(np.array(processed_pil), cv2.COLOR_RGB2BGR)
-    # loops through each word and adds box around it on image
-    for i in range(len(data["text"])):
-        word = data["text"][i]
-        conf = int(data["conf"][i])
-        # feel free to toy around with this number-- it represents a confidence threshold for
-        # drawing boundary boxes on the image. Anything that falls below it will not be included
-        # in the transcription. Not sure if 60 is a good value or not '''
-        if conf > 60 and word.strip():
-            x, y, w, h = (
-                data["left"][i],
-                data["top"][i],
-                data["width"][i],
-                data["height"][i],
-            )
-            # could  change the look of the box on the image by tweaking this @ Johnny and Sophia
-            # x --> left-most x pixel
-            # y  --> top-most y pixel
-            # w --> width
-            # h --> height '''
-            cv2.rectangle(boxes, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    # save new image with added boxes
-    box_filename = "box_" + filename
-    box_path = os.path.join("static/processed", box_filename)
-    cv2.imwrite(box_path, boxes)
-    return box_path
+    entries = collection.find({"user_id": str(current_user.id)})
+    print(current_user.id)
+    return rt("history.html", entries=entries)
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    """Logout user"""
+    logout_user()
+    flash("You have been logged out.")
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
-    os.makedirs(UPLOADS, exist_ok=True)
     app.run(host="0.0.0.0", port=8000, debug=True)

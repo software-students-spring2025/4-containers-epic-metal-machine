@@ -5,12 +5,14 @@ name = "pypi"
 
 [packages]
 flask = "*"
-opencv-python = "*"
-pytesseract = "*"
 pylint = "*"
+black = "*"
+requests = "*"
 tomli = "*"
 typing-extensions = "*"
-black = "*"
+pymongo = "*"
+dotenv = "*"
+flask-login = "*"
 
 [dev-packages]
 
