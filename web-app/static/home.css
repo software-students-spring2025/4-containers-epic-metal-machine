@@ -1,6 +1,6 @@
 body {
     background-color: #fefae0;
-    height: 120vh
+    height: 150vh
 }
 
 .title {
@@ -11,7 +11,7 @@ body {
     font-size: 5vw;
     color: #606c38;
     height: 20vh;
-    margin-top: 15vh;
+    margin-top: 20vh;
     font-weight: 900;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
@@ -88,4 +88,50 @@ input::file-selector-button {
   .sub:hover {
     background-color: #faedcd;
     cursor: pointer;
+  }
+
+  .upload {
+    height:6vh; 
+    width:8vw;
+    font-size: 4vh; 
+    border-radius: 12px; 
+    padding-left: 1vw; 
+    padding: 2vh;
+    background-color: #606c38; 
+    border: solid #606c38; 
+    margin-top:1vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: end;
+    margin-left: 3vw;
+    margin-top: 10vh;
+    margin-right: 3vw;
+  }
+
+  a {
+    margin: 2vh;
+  }
+
+  a:link {
+    color:#FFFFFF; 
+    background-color: transparent;
+    text-decoration: none;
+  }
+  
+  a:visited {
+    color:#FFFFFF; 
+    background-color: transparent;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #96a48b;
+    background-color: transparent;
+    text-decoration: none;
   }

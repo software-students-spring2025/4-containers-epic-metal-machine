@@ -1,7 +1,7 @@
 """Routers for webapp"""
 
-# import datetime
 import os
+
 from flask import (
     Flask,
     render_template as rt,
