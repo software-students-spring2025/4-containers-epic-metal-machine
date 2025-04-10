@@ -2,13 +2,35 @@
 <html>
 <head>
     <title>OCR Result</title>
+    <link rel="stylesheet" href="../static/history.css">
 </head>
 <body>
-<h1>Text from Image</h1>
-    {% for entry in entries %}
-        <p>{{ entry["date-time"] }}</p>
-        <pre>{{ entry["text"]}}</pre>
-    {% endfor %}
-<a href="{{ url_for('home') }}">Upload another image</a>
+
+    <div class="title">Epic Metal Machine  &nbsp <p>&#129302</p></div>
+    <div class="Image">
+        <div class="imageTitle">Your Transcription History</div>
+
+    </div>
+
+    <div class="entries">
+        {% for entry in entries %}
+            <div class="eachEntry">
+                <div class="date">At {{ entry["date-time"] }}</div>
+                <div class="text">{{ entry["text"]}}</div>
+            </div>
+
+        {% endfor %}
+
+        <a href="{{ url_for('home') }}">
+            <div class="upload">
+                Upload Another Image
+            </div>
+        </a>
+
+        <br><br>
+    </div>  
+
+
+
 </body>
 </html>
