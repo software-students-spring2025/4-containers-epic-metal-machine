@@ -27,13 +27,59 @@
     <div class="uploadPic">
         <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
             <input type="file" style="color:transparent;" id="fileInput" name="image" accept="image/*" required>
-            <input type="submit" class="sub" value="Transcribe">
+            <input type="submit" class="sub" value="Transcribe">       
         </form>
+
+    </div>
+    <div class="camera">
+      <button id="startButton">Start Webcam</button>
+      <button id="captureButton">Capture Photo</button>
     </div>
 
+    <div class="display">
+      <video id="videoElement" autoplay></video>
+      <canvas id="canvasElement" style="display: none;"></canvas>
+      <img id="photoElement" style="display: none;">
+    </div>
+        <!-- JS for web cam -->
+        <script>
+            const videoElement = document.getElementById('videoElement');
+            const canvasElement = document.getElementById('canvasElement');
+            const photoElement = document.getElementById('photoElement');
+            const startButton = document.getElementById('startButton');
+            const captureButton = document.getElementById('captureButton');
+
+            let stream;
+
+            async function startWebcam() {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    videoElement.srcObject = stream;
+                    startButton.disabled = true;
+                    captureButton.disabled = false;
+                } catch (error) {
+                    console.error('Error accessing webcam:', error);
+                }
+            }
+
+            startButton.addEventListener('click', startWebcam);
+
+            function capturePhoto() {
+              canvasElement.width = videoElement.videoWidth;
+              canvasElement.height = videoElement.videoHeight;
+              canvasElement.getContext('2d').drawImage(videoElement, 0, 0);
+              const photoDataUrl = canvasElement.toDataURL('image/jpeg');
+              photoElement.src = photoDataUrl;
+              photoElement.style.display = 'block';
+            }
+
+            captureButton.addEventListener('click', capturePhoto);
+        </script>
+        
 
 <div id="preview"></div>
 
+<!-- JS for file upload images -->
 <script>
 	document.getElementById('fileInput').addEventListener('change', function(event) {
     var files = event.target.files;
