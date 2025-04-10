@@ -1,13 +1,14 @@
 """Routers for webapp"""
 
 # import datetime
-from flask import Flask, render_template as rt, request, session, redirect
+from flask import Flask, render_template as rt, request, session, redirect, url_for
 import requests
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
 client = MongoClient("mongodb://mongodb:27017/")
-db = client["users"]
+db = client["epic-metal-machine"]
+collection = db["entries"]
 
 # can update this with more extensions later
 valid_extensions = {"png", "jpeg", "jpg"}
@@ -71,7 +72,7 @@ def profile():
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    """ "Reads file upload and relay to backend"""
+    """Reads file upload and relay to backend"""
 
     # Checks if an image was uploaded
     if "image" not in request.files:
@@ -84,8 +85,16 @@ def upload():
 
     url = "http://backend:8000/upload"
     files = {"file": file}
-    data = requests.post(url, files=files, timeout=3).json()
-    return rt("upload.html", text=data["text"])
+    requests.post(url, files=files, timeout=3)
+    return redirect(url_for("history"))
+
+
+@app.route("/history", methods=["GET"])
+def history():
+    """Return OCR history"""
+
+    entries = collection.find()
+    return rt("history.html", entries=entries)
 
 
 if __name__ == "__main__":

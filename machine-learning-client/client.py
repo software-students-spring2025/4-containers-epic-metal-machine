@@ -2,8 +2,8 @@
 
 import os
 
-from bson import ObjectId
-from flask import Flask, request, jsonify, session
+from datetime import datetime
+from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename as sf
 from PIL import Image
 import pytesseract
@@ -14,8 +14,8 @@ from pymongo import MongoClient
 # mongodb compass connection string is mongodb://localhost:27017
 client = MongoClient("mongodb://mongodb:27017/")
 
-db = client["users"]
-collection = db["users"]
+db = client["epic-metal-machine"]
+collection = db["entries"]
 
 
 app = Flask(__name__)
@@ -40,6 +40,7 @@ def upload():
     filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
     file.save(filepath)
     cv_img = cv2.imread(filepath)
+    # os.remove(filepath)
     # Removes color from the image. I think this should improve performance in theory but
     # maybe there's a situation where this will actually cause problems? idk. also ups the
     # contrast of the image
@@ -65,19 +66,13 @@ def upload():
                 lines[line_num] = []
             lines[line_num].append(word.strip())
     extracted = "\n".join([" ".join(line_words) for line_words in lines.values()])
-    data = {"file": filepath, "text": extracted}
-    if session.get("user_id"):
-        user = db.users.find_one({"_id": ObjectId(session.get("user_id"))})
-        user["saved_transcriptions"].append(data)
-        db.users.update_one(
-            {"_id": user["_id"]},  # match criteria
-            {
-                "$set": {
-                    "saved_recipes": list(user["saved_recipes"]),
-                }
-            },
-        )
-    return jsonify(data)
+    data = {
+        "date-time": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+        "text": extracted,
+    }
+    collection.insert_one(data)
+
+    return jsonify({"status": "successful"}), 200
 
 
 if __name__ == "__main__":
