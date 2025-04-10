@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>OCR Result</title>
     <link rel="stylesheet" href="../static/history.css">
 </head>
+
 <body>
 
-    <div class="title">Epic Metal Machine  &nbsp <p>&#129302</p></div>
+    <div class="title">Epic Metal Machine &nbsp <p>&#129302</p>
+    </div>
     <div class="Image">
         <div class="imageTitle">Your Transcription History</div>
 
@@ -14,10 +17,10 @@
 
     <div class="entries">
         {% for entry in entries %}
-            <div class="eachEntry">
-                <div class="date">At {{ entry["date-time"] }}</div>
-                <div class="text">{{ entry["text"]}}</div>
-            </div>
+        <div class="eachEntry">
+            <div class="date">At {{ entry["date-time"] }}</div>
+            <div class="text">{{ entry["text"]}}</div>
+        </div>
 
         {% endfor %}
 
@@ -28,9 +31,10 @@
         </a>
 
         <br><br>
-    </div>  
+    </div>
 
 
 
 </body>
+
 </html>
