@@ -1,10 +1,26 @@
 """Routers for webapp"""
 
 # import datetime
-from flask import Flask, render_template as rt, request, session, redirect, url_for
+from flask import (
+    Flask,
+    render_template as rt,
+    request,
+    redirect,
+    url_for,
+    flash,
+)
+from flask_login import (
+    LoginManager,
+    login_user,
+    logout_user,
+    login_required,
+    UserMixin,
+    current_user,
+)
 import requests
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from werkzeug.security import generate_password_hash, check_password_hash
 
 client = MongoClient("mongodb://mongodb:27017/")
 db = client["epic-metal-machine"]
@@ -20,9 +36,36 @@ def valid_file(f):
 
 
 app = Flask(__name__)
+app.secret_key = "your_secret_key_here"
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+
+class User(UserMixin):
+    """User class"""
+
+    def __init__(self, id, username, password_hash):
+        self.id = id
+        self.username = username
+        self.password_hash = password_hash
+
+    def check_password(self, password):
+        """checks password"""
+        return check_password_hash(self.password_hash, password)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load user callback"""
+    user_data = db["users"].find_one({"_id": ObjectId(user_id)})
+    if user_data:
+        return User(user_data["_id"], user_data["username"], user_data["password"])
+    return None
 
 
 @app.route("/")
+@login_required
 def home():
     """Routing for index"""
     return rt("home.html")
@@ -33,17 +76,14 @@ def sign_up():
     """Sign up screen"""
     if request.method == "POST":
         username = request.form.get("username")
-        email = request.form.get("email")
         password = request.form.get("password")
         user = {
             "username": username,
-            "email": email,
-            "password": password,
-            "saved_transcriptions": [],
+            "password": generate_password_hash(password),
         }
-        user = db.users.insert_one(user)
-        session["user_id"] = str(user.inserted_id)
-        return redirect("/")
+        user = db["users"].insert_one(user)
+        flash("Registration successful! Please log in.", "success")
+        return redirect(url_for("login"))
     return rt("signup.html")
 
 
@@ -51,26 +91,26 @@ def sign_up():
 def login():
     """Login screen"""
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-        if db.users.find_one({"username": username, "password": password}) is not None:
-            user = db.users.find_one({"username": username, "password": password})
-            session["user_id"] = str(user["_id"])
-            print(session["user_id"])
-            return redirect("/home")
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # Look for the user in our in-memory database
+        user_data = db["users"].find_one({"username": username})
+
+        if user_data and check_password_hash(user_data["password"], password):
+            login_user(
+                User(user_data["_id"], user_data["username"], user_data["password"])
+            )
+            flash("Logged in successfully.")
+            return redirect(url_for("home"))
+
+        flash("Invalid username or password")
+        return redirect(url_for("login"))
     return rt("login.html")
 
 
-@app.route("/profile_page")
-def profile():
-    """Profile screen"""
-    if not session.get("user_id"):
-        return redirect("/home")
-    user = db.users.find_one({"_id": ObjectId(session.get("user_id"))})
-    return rt("profile_page.html", user=user)
-
-
 @app.route("/upload", methods=["POST"])
+@login_required
 def upload():
     """Reads file upload and relay to backend"""
 
@@ -84,17 +124,29 @@ def upload():
         return "Invalid file type"
 
     url = "http://backend:8000/upload"
-    files = {"file": file}
-    requests.post(url, files=files, timeout=3)
+    file = {"file": file}
+    data = {"id": current_user.id}
+    requests.post(url, files=file, data=data, timeout=3)
     return redirect(url_for("history"))
 
 
 @app.route("/history", methods=["GET"])
+@login_required
 def history():
     """Return OCR history"""
 
-    entries = collection.find()
+    entries = collection.find({"user_id": str(current_user.id)})
+    print(current_user.id)
     return rt("history.html", entries=entries)
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    """Logout user"""
+    logout_user()
+    flash("You have been logged out.")
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":

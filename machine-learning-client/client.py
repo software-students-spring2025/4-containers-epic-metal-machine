@@ -36,6 +36,7 @@ def upload():
     """Routing for upload"""
 
     file = request.files["file"]
+    user_id = request.form.get("id")
     filename = sf(file.filename)
     filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
     file.save(filepath)
@@ -68,6 +69,7 @@ def upload():
     extracted = "\n".join([" ".join(line_words) for line_words in lines.values()])
     data = {
         "date-time": datetime.now().strftime("%m/%d/%Y, %H:%M:%S"),
+        "user_id": user_id,
         "text": extracted,
     }
     collection.insert_one(data)
