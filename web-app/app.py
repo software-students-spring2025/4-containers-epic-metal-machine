@@ -1,6 +1,7 @@
 """Routers for webapp"""
 
-# import datetime
+import os
+
 from flask import (
     Flask,
     render_template as rt,
@@ -18,7 +19,6 @@ from flask_login import (
     current_user,
 )
 import requests
-import os
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
