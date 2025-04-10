@@ -3,6 +3,7 @@
 # Team Members
 [Alex Wang](https://github.com/alw9411), [Kurt Luko](https://github.com/kl3641), [Sophia Wang](https://github.com/s-m-wang), [Johnny Ding](https://github.com/yd2960)
 
+
 # Project Description
 Our project recognizes text in images and transcribes it to plaintext. This is useful to people who may want to copy paste large chunks of texts from images, and also is useful to people who use screen readers in order to read text. Only Latin characters are supported.
 
