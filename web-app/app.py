@@ -25,13 +25,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # conditional for testing purposes
 if os.environ.get("TESTING") == "true":
-    client = None
-    db = None
-    collection = None
+    CLIENT = None
+    DB = None
+    COLLECTION = None
 else:
-    client = MongoClient("mongodb://mongodb:27017/")
-    db = client["epic-metal-machine"]
-    collection = db["entries"]
+    CLIENT = MongoClient("mongodb://mongodb:27017/")
+    DB = CLIENT["epic-metal-machine"]
+    COLLECTION = DB["entries"]
 
 # can update this with more extensions later
 valid_extensions = {"png", "jpeg", "jpg"}
@@ -65,7 +65,7 @@ class User(UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
     """Load user callback"""
-    user_data = db["users"].find_one({"_id": ObjectId(user_id)})
+    user_data = DB["users"].find_one({"_id": ObjectId(user_id)})
     if user_data:
         return User(user_data["_id"], user_data["username"], user_data["password"])
     return None
@@ -88,7 +88,7 @@ def sign_up():
             "username": username,
             "password": generate_password_hash(password),
         }
-        user = db["users"].insert_one(user)
+        user = DB["users"].insert_one(user)
         flash("Registration successful! Please log in.", "success")
         return redirect(url_for("login"))
     return rt("signup.html")
@@ -102,7 +102,7 @@ def login():
         password = request.form["password"]
 
         # Look for the user in our in-memory database
-        user_data = db["users"].find_one({"username": username})
+        user_data = DB["users"].find_one({"username": username})
 
         if user_data and check_password_hash(user_data["password"], password):
             login_user(
@@ -142,7 +142,7 @@ def upload():
 def history():
     """Return OCR history"""
 
-    entries = collection.find({"user_id": str(current_user.id)})
+    entries = COLLECTION.find({"user_id": str(current_user.id)})
     print(current_user.id)
     return rt("history.html", entries=entries)
 

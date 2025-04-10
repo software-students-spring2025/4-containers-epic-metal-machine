@@ -16,8 +16,8 @@ def mongoDB_simulation():
     entries = MagicMock()
     db = MagicMock()
     db.__getitem__.side_effect = lambda x: users if x == "users" else entries
-    with patch('app.db', db), \
-            patch('app.collection', entries):
+    with patch('app.DB', db), \
+            patch('app.COLLECTION', entries):
         yield (users, entries)
 
 
