@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OCR Result</title>
+</head>
+<body>
+<h1>Text from Image</h1>
+    {% for entry in entries %}
+        <p>{{ entry["date-time"] }}</p>
+        <pre>{{ entry["text"]}}</pre>
+    {% endfor %}
+<a href="{{ url_for('home') }}">Upload another image</a>
+</body>
+</html>
