@@ -1,0 +1,30 @@
+name: CI / CD
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python, pipenv and root Pipfile deps
+        uses: kojoru/prepare-pipenv@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install local dependencies
+        run: |
+          pipenv install --dev  # or --system if you prefer plain pip
+          pipenv install -r machine_learning_client/container_req.txt
+          pipenv install -r web-app/container_req.txt
+
+      - name: Run pytest on all tests
+        run: |
+          pipenv install pytest
+          pipenv run pytest tests/
