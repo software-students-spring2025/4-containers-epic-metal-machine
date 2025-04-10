@@ -1,136 +1,169 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Image Upload</title>
-    <link rel="stylesheet" href="../static/home.css">
+  <title>Image Upload</title>
+  <link rel="stylesheet" href="../static/home.css">
 </head>
+
 <body>
-    <div class="buttons">
-      <a href="{{ url_for('logout') }}">
-        <div class="upload">
-          Log Out
-        </div>
-      </a>
-      <a href="{{ url_for('history') }}">
-        <div class="upload">
-          History
-        </div>
-      </a>
+  <div class="buttons">
+    <a href="{{ url_for('logout') }}">
+      <div class="upload">
+        Log Out
+      </div>
+    </a>
+    <a href="{{ url_for('history') }}">
+      <div class="upload">
+        History
+      </div>
+    </a>
   </div>
-    <div class="title">Epic Metal Machine  &nbsp <p>&#129302</p></div>
-    <div class="subtitle">Having trouble reading messy handwriting? Fear not! Our Epic Metal Machine is here to help. We transcribe
-        messy handwriting into legible print. Make sure
-        your file has the JPG, PNG, or JPEG extension.
-    </div>
-    <div class="l"></div>
-    <div class="uploadHere">Upload your image here!</div>
-    <div class="uploadPic">
-        <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
-            <input type="file" style="color:transparent;" id="fileInput" name="image" accept="image/*" required>
-            <input type="submit" class="sub" value="Transcribe">       
-        </form>
+  <div class="title">Epic Metal Machine &nbsp <p>&#129302</p>
+  </div>
+  <div class="subtitle">Having trouble reading messy handwriting? Fear not! Our Epic Metal Machine is here to help. We
+    transcribe
+    messy handwriting into legible print. Make sure
+    your file has the JPG, PNG, or JPEG extension.
+  </div>
+  <div class="l"></div>
+  <div class="uploadHere">Upload your image here!</div>
+  <div class="uploadPic">
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+      <input type="file" style="color:transparent;" id="fileInput" name="image" accept="image/*" required>
+      <input type="submit" class="sub" value="Transcribe">
+    </form>
 
-    </div>
-    <div class="camera">
-      <button id="startButton">Start Webcam</button>
-      <button id="captureButton">Capture Photo</button>
-    </div>
+  </div>
+  <div class="camera">
+    <button id="startButton">Start Webcam</button>
+    <button id="captureButton">Capture Photo</button>
+  </div>
 
-    <div class="display">
-      <video id="videoElement" autoplay></video>
-      <canvas id="canvasElement" style="display: none;"></canvas>
-      <img id="photoElement" style="display: none;">
-    </div>
-        <!-- JS for web cam -->
-        <script>
-            const videoElement = document.getElementById('videoElement');
-            const canvasElement = document.getElementById('canvasElement');
-            const photoElement = document.getElementById('photoElement');
-            const startButton = document.getElementById('startButton');
-            const captureButton = document.getElementById('captureButton');
+  <div class="display">
+    <video id="videoElement" autoplay></video>
+    <canvas id="canvasElement" style="display: none;"></canvas>
+    <img id="photoElement" style="display: none;">
+  </div>
+  <!-- JS for web cam -->
+  <script>
+    const videoElement = document.getElementById('videoElement');
+    const canvasElement = document.getElementById('canvasElement');
+    const photoElement = document.getElementById('photoElement');
+    const startButton = document.getElementById('startButton');
+    const captureButton = document.getElementById('captureButton');
 
-            let stream;
+    let stream;
 
-            async function startWebcam() {
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    videoElement.srcObject = stream;
-                    startButton.disabled = true;
-                    captureButton.disabled = false;
-                } catch (error) {
-                    console.error('Error accessing webcam:', error);
-                }
-            }
-
-            startButton.addEventListener('click', startWebcam);
-
-            function capturePhoto() {
-              canvasElement.width = videoElement.videoWidth;
-              canvasElement.height = videoElement.videoHeight;
-              canvasElement.getContext('2d').drawImage(videoElement, 0, 0);
-              const photoDataUrl = canvasElement.toDataURL('image/jpeg');
-              photoElement.src = photoDataUrl;
-              photoElement.style.display = 'block';
-            }
-
-            captureButton.addEventListener('click', capturePhoto);
-        </script>
-        
-
-<div id="preview"></div>
-
-<!-- JS for file upload images -->
-<script>
-	document.getElementById('fileInput').addEventListener('change', function(event) {
-    var files = event.target.files;
-    var preview = document.getElementById('preview');
-    
-    // Clear any existing content
-    preview.innerHTML = '';
-
-    // Loop through all selected files
-    for (var i = 0; i < files.length; i++) {
-      var file = files[i];
-
-      // Only process image files
-      if (!file.type.match('image.*')) {
-        continue;
+    async function startWebcam() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoElement.srcObject = stream;
+        startButton.disabled = true;
+        captureButton.disabled = false;
+      } catch (error) {
+        console.error('Error accessing webcam:', error);
       }
-
-      var imgContainer = document.createElement('div');
-      imgContainer.style.marginBottom = '20px'; // Spacing between each image container
-      imgContainer.style.display =  'flex';
-      imgContainer.style.justifyContent = 'center';
-      imgContainer.style.alignItems = 'center';
-      imgContainer.style.textAlign = 'center';
-      imgContainer.style.flexDirection = 'column';
-
-      var img = document.createElement('img');
-      img.src = URL.createObjectURL(file);
-      img.style.height = '45vh';
-      img.style.display = 'block'; // Ensure the image is displayed in a block to put it on a new line
-      img.style.marginTop = '5vh';
-      img.style.backgroundColor = '#606c38';
-      img.style.padding = '5vh';
-      img.style.borderRadius = '12px';
-      
-
-      var fileInfo = document.createElement('p');
-      fileInfo.textContent = `File Name: ${file.name}, Type: ${file.type}, Size: ${file.size} bytes`;
-      fileInfo.style.fontSize = '2vh';
-      fileInfo.style.marginTop = '2vh';
-      fileInfo.style.marginBottom = '15vh';
-
-      // Append the image and file info to the container
-      imgContainer.appendChild(img);
-      imgContainer.appendChild(fileInfo);
-
-      // Append the container to the preview div
-      preview.appendChild(imgContainer);
     }
-  });
-</script>
+
+    startButton.addEventListener('click', startWebcam);
+
+    function capturePhoto() {
+      canvasElement.width = videoElement.videoWidth;
+      canvasElement.height = videoElement.videoHeight;
+      const ctx = canvasElement.getContext('2d');
+      ctx.drawImage(videoElement, 0, 0);
+
+      photoElement.src = canvasElement.toDataURL('image/jpeg');
+      photoElement.style.display = 'block';
+
+      canvasElement.toBlob(async (blob) => {
+        const form = new FormData();
+        form.append('image', blob, 'capture.jpg');
+
+        try {
+          const resp = await fetch('/upload', {
+            method: 'POST',
+            body: form,
+          });
+
+          if (!resp.ok && !resp.redirected) {
+            throw new Error(`Upload failed: ${resp.status}`);
+          }
+
+          if (resp.redirected) {
+            window.location.href = resp.url;
+          } else {
+            // allback to hard‑coded history page
+            window.location.href = '/history';
+          }
+
+        } catch (err) {
+          console.error(err);
+        }
+      }, 'image/jpeg', 0.95);
+    }
+
+
+    captureButton.addEventListener('click', capturePhoto);
+  </script>
+
+
+  <div id="preview"></div>
+
+  <!-- JS for file upload images -->
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+      var files = event.target.files;
+      var preview = document.getElementById('preview');
+
+      // Clear any existing content
+      preview.innerHTML = '';
+
+      // Loop through all selected files
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+
+        // Only process image files
+        if (!file.type.match('image.*')) {
+          continue;
+        }
+
+        var imgContainer = document.createElement('div');
+        imgContainer.style.marginBottom = '20px'; // Spacing between each image container
+        imgContainer.style.display = 'flex';
+        imgContainer.style.justifyContent = 'center';
+        imgContainer.style.alignItems = 'center';
+        imgContainer.style.textAlign = 'center';
+        imgContainer.style.flexDirection = 'column';
+
+        var img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.style.height = '45vh';
+        img.style.display = 'block'; // Ensure the image is displayed in a block to put it on a new line
+        img.style.marginTop = '5vh';
+        img.style.backgroundColor = '#606c38';
+        img.style.padding = '5vh';
+        img.style.borderRadius = '12px';
+
+
+        var fileInfo = document.createElement('p');
+        fileInfo.textContent = `File Name: ${file.name}, Type: ${file.type}, Size: ${file.size} bytes`;
+        fileInfo.style.fontSize = '2vh';
+        fileInfo.style.marginTop = '2vh';
+        fileInfo.style.marginBottom = '15vh';
+
+        // Append the image and file info to the container
+        imgContainer.appendChild(img);
+        imgContainer.appendChild(fileInfo);
+
+        // Append the container to the preview div
+        preview.appendChild(imgContainer);
+      }
+    });
+  </script>
 
 
 </body>
+
 </html>
