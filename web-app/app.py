@@ -1,6 +1,7 @@
 """Routers for webapp"""
 
-# import datetime
+import os
+
 from flask import (
     Flask,
     render_template as rt,
@@ -22,9 +23,15 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 
-client = MongoClient("mongodb://mongodb:27017/")
-db = client["epic-metal-machine"]
-collection = db["entries"]
+# conditional for testing purposes
+if os.environ.get("TESTING") == "true":
+    client = None
+    db = None
+    collection = None
+else:
+    client = MongoClient("mongodb://mongodb:27017/")
+    db = client["epic-metal-machine"]
+    collection = db["entries"]
 
 # can update this with more extensions later
 valid_extensions = {"png", "jpeg", "jpg"}

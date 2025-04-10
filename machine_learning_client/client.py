@@ -1,7 +1,6 @@
 """Routers for machine learning client"""
 
 import os
-
 from datetime import datetime
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename as sf
@@ -54,7 +53,6 @@ def upload():
     )
     lines = {}
     # loop through words again and remove ones from transcription with low confidence
-    # will figure out how to just make this one loop instead of two at a later date
     for i in range(len(data["text"])):
         word = data["text"][i]
         conf = int(data["conf"][i])
